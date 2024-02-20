@@ -65,7 +65,7 @@ public class CharacterControllerS : MonoBehaviour
     private void HandleMovement()
     {
         Vector2 movementInput = inputManager.GetPlayerMovement();
-        Vector3 moveDirection = new Vector3(movementInput.x, 0f, movementInput.y);
+        Vector3 moveDirection = transform.forward * movementInput.y + transform.right * movementInput.x;
         float speed = isSprinting ? currentSpeed : walkSpeed;
         characterController.Move(moveDirection * speed * Time.deltaTime);
         Debug.Log(speed);
@@ -74,10 +74,14 @@ public class CharacterControllerS : MonoBehaviour
     private void HandleRotation()
     {
         Vector2 rotateInput = inputManager.GetCameraRotate();
+        float xRotation = rotateInput.y;
         transform.Rotate(Vector3.up, rotateInput.x);
-
-        transform.Rotate(Vector3.right, rotateInput.y);
+        Vector3 currentRotation = transform.rotation.eulerAngles;
+        currentRotation.z = 0f;
+        transform.rotation = Quaternion.Euler(currentRotation);
+        transform.Rotate(Vector3.right, xRotation);
     }
+
     private void HandleActions()
     {
         if (inputManager.GetFlashButtonDown())
