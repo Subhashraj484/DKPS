@@ -23,6 +23,8 @@ public class PickupAndDrop : SuperBehaviour
                 if(pickedRigidbody != null)
                 {
                     pickedRigidbody.useGravity = true;
+                    pickedRigidbody.useGravity = false;
+
                     pickup = false;
                 }
             }
@@ -41,6 +43,7 @@ public class PickupAndDrop : SuperBehaviour
                 {
                     pickedRigidbody = pickedObject.transform.GetComponent<Rigidbody>();
                     pickedRigidbody.useGravity = false;
+                    pickedRigidbody.useGravity = true;
                     pickedObject.position = objectHoldPoint.position;
                     pickup = true;
                 }
