@@ -15,20 +15,23 @@ public class PickupAndDrop : SuperBehaviour
     bool pickup;
     Transform pickedObject;
     Rigidbody pickedRigidbody;
+    float smoothTime = 0.2f;
     void Update()
     {
+        Ray ray = mianCamera.ViewportPointToRay(new Vector3(0.5f , 0.5f , 0));
 
         if(Input.GetKeyDown(KeyCode.F) && pickup)
             {
-                if(pickedRigidbody != null)
+                if(pickedObject != null)
                 {
                     pickedRigidbody.useGravity = true;
-                    pickedRigidbody.useGravity = false;
-
+                    pickedObject = null;
+                    pickedRigidbody = null;
                     pickup = false;
+                    //trow
                 }
             }
-        Ray ray = mianCamera.ViewportPointToRay(new Vector3(0.5f , 0.5f , 0));
+            else
 
         if(Physics.Raycast(ray.origin , ray.direction , out raycastHit, pickupRange , pickupObjectLayer ) && !pickup)
         {
@@ -43,12 +46,16 @@ public class PickupAndDrop : SuperBehaviour
                 {
                     pickedRigidbody = pickedObject.transform.GetComponent<Rigidbody>();
                     pickedRigidbody.useGravity = false;
-                    pickedRigidbody.useGravity = true;
-                    pickedObject.position = objectHoldPoint.position;
                     pickup = true;
                 }
             }
             
+        }
+
+        if(pickedObject != null)
+        {
+            Vector3 targetPosition = Vector3.Lerp(pickedObject.position , objectHoldPoint.position , smoothTime);
+            pickedRigidbody.MovePosition(targetPosition);
         }
         
     }
