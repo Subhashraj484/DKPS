@@ -16,40 +16,22 @@ public class PickupAndDrop : SuperBehaviour
     Transform pickedObject;
     Rigidbody pickedRigidbody;
     float smoothTime = 0.2f;
+    float throwForce = 10f;
+
     void Update()
     {
         Ray ray = mianCamera.ViewportPointToRay(new Vector3(0.5f , 0.5f , 0));
 
-        if(Input.GetKeyDown(KeyCode.F) && pickup)
-            {
-                if(pickedObject != null)
-                {
-                    pickedRigidbody.useGravity = true;
-                    pickedObject = null;
-                    pickedRigidbody = null;
-                    pickup = false;
-                    //trow
-                }
-            }
-            else
-
-        if(Physics.Raycast(ray.origin , ray.direction , out raycastHit, pickupRange , pickupObjectLayer ) && !pickup)
+        if(Input.GetKeyDown(KeyCode.F))
         {
-            if(Input.GetKeyDown(KeyCode.F) )
+            if(pickup)
             {
-                pickedObject = raycastHit.transform;
-                if(pickedObject.TryGetComponent<Interactable>(out Interactable interactable))
-                {
-                    interactable.Interact();
-                }
-                else
-                {
-                    pickedRigidbody = pickedObject.transform.GetComponent<Rigidbody>();
-                    pickedRigidbody.useGravity = false;
-                    pickup = true;
-                }
+                ThrowObject();
             }
-            
+            else if(Physics.Raycast(ray.origin , ray.direction , out raycastHit, pickupRange , pickupObjectLayer ))
+            {
+                PickObject(); 
+            }
         }
 
         if(pickedObject != null)
@@ -57,7 +39,32 @@ public class PickupAndDrop : SuperBehaviour
             Vector3 targetPosition = Vector3.Lerp(pickedObject.position , objectHoldPoint.position , smoothTime);
             pickedRigidbody.MovePosition(targetPosition);
         }
-        
+    }
+
+    void PickObject()
+    {
+        pickedObject = raycastHit.transform;
+        if(pickedObject.TryGetComponent<Interactable>(out Interactable interactable))
+        {
+            interactable.Interact();
+        }
+        else
+        {
+            pickedRigidbody = pickedObject.transform.GetComponent<Rigidbody>();
+            pickedRigidbody.useGravity = false;
+            pickup = true;
+        }
+    }
+
+    void ThrowObject()
+    {
+        if(pickedObject != null && pickedRigidbody != null)
+        {
+            pickedRigidbody.useGravity = true;
+            pickedRigidbody.AddForce(mianCamera.transform.forward * throwForce, ForceMode.Impulse);
+            pickedObject = null;
+            pickedRigidbody = null;
+            pickup = false;
+        }
     }
 }
-
